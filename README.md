@@ -16,7 +16,7 @@ import (
 	"encoding/binary"
 	"fmt"
 
-	blur "github.com/tommd/bloom-lru"
+	coolru "github.com/tommd/golang-cuckoo-lru"
 )
 
 type Key int64
@@ -29,7 +29,7 @@ func (k Key) MarshalBinary() ([]byte, error) {
 
 func main() {
 	// Create filter with capacity 1000, 0.01% false positive rate, and LRU size 100
-	f, _ := blur.New(1000, 0.0001, 100)
+	f, _ := coolru.New(1000, 0.0001, 100)
 
 	// Add an element
 	f.Add(Key(42))
@@ -48,11 +48,11 @@ func main() {
 	// Serialize (LRU data is NOT included)
 	data, _ := f.MarshalBinary()
 
-	// Deserialize into a new filter
-	f2, _ := blur.New(1000, 0.0001, 100)
-	f2.UnmarshalBinary(data)
+	// Deserialize into a new filter (only LRU size needed)
+	f2, _ := coolru.NewFromBytes(data, 100)
 
-	// LRU was not serialized, so false positive mark is gone
+	// LRU is never serialized, so false positive mark is gone
+    // in practice this will impact application warm up
 	found, _ = f2.Check(Key(42))
 	fmt.Println("After Deserialize:", found) // true
 }

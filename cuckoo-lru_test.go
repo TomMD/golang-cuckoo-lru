@@ -1,4 +1,4 @@
-package bloom_lru
+package coolru
 
 import "fmt"
 import "encoding/binary"
@@ -13,31 +13,31 @@ func (o Obj) MarshalBinary() ([]byte, error) {
 }
 
 func TestBasic(t *testing.T) {
-        blur, _ := New(1<<16, 0.0001, 1<<12)
+        filt, _ := New(1<<16, 0.0001, 1<<12)
         for i := range (1<<12) {
-      	  blur.Add(Obj(i))
+      	  filt.Add(Obj(i))
         }
 	falsePositives := 0
         for i := 1<<12; i < (1<<20) && falsePositives < (1<<12); i++ {
 	  io := Obj(i)
-      	  oops, _ := blur.Check(io)
+      	  oops, _ := filt.Check(io)
       	  if oops {
 		  falsePositives++
 		  // High probability of at least one false positive, likely more
-      		  blur.MarkFalsePositive(io)
-      		  unoops, _ := blur.Check(io)
+      		  filt.MarkFalsePositive(io)
+      		  unoops, _ := filt.Check(io)
 		  errMsg := fmt.Sprintf("Oopsed on %d, marked FP, but now it returns %t\n", i, unoops)
 		  require.Equal(t, unoops, false, errMsg)
       	  }
         }
         for i := range (1<<12) {
 		io := Obj(i)
-		res, _ := blur.Check(io)
+		res, _ := filt.Check(io)
 		require.Equal(t, res, true, fmt.Sprintf("Expected true for value %d", i))
 	}
         for i := 1<<12; i < (1<<20); i++ {
 		io := Obj(i)
-		res, _ := blur.Check(io)
+		res, _ := filt.Check(io)
 		require.Equal(t, res, false, fmt.Sprintf("Expected false for value %d", i))
 	}
 }
