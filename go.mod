@@ -1,4 +1,4 @@
-module github.com/tommd/bloom-lru
+module github.com/tommd/golang-cuckoo-lru
 
 go 1.25.5
 

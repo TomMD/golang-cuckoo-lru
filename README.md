@@ -1,4 +1,4 @@
-# bloom-lru
+# Cuckoo-lru (CooLRU)
 
 A cuckoo filter with an LRU cache to track known false positives.
 The LRU exists to catch popular elements that are false positives in the
